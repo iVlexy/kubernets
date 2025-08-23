@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: technitium-dns-deployment
+  labels:
+    app: technitium-dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: technitium-dns
+  template:
+    metadata:
+      labels:
+        app: technitium-dns
+    spec:
+      containers:
+        - name: dns-server
+          image: technitium/dns-server:latest
+          env:
+            - name: DNS_SERVER_DOMAIN
+              value: browning.cloud
+            - name: DNS_SERVER_ADMIN_PASSWORD
+              value: password
+          ports:
+            - containerPort: 5380
+              name: dns-web-http
+              protocol: TCP
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/dns
+      volumes:
+        - name: config-volume
+          persistentVolumeClaim:
+            claimName: technitium-dns-pvc
+      securityContext:
+        sysctls:
+          - name: net.ipv4.ip_local_port_range
+            value: "1024 65000"
+      restartPolicy: Always
