@@ -5,6 +5,8 @@ metadata:
     app: qbittorrent
   name: qbittorrent
 spec:
+  imagePullSecrets:
+    - name: my-dockerhub-secret
   replicas: 1
   selector:
     matchLabels:
@@ -54,7 +56,6 @@ spec:
       # vpn client container
       initContainers:
       - image: frauhottelmann/openvpn-client
-        imagePullPolicy: IfNotPresent
         name: openvpn
         restartPolicy: Always
         resources: {}
