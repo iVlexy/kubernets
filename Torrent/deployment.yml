@@ -15,8 +15,6 @@ spec:
       labels:
         app: qbittorrent
     spec:
-      imagePullSecrets:
-        - name: my-dockerhub-secret
       securityContext:
         fsGroup: 65534
         runAsUser: 0
