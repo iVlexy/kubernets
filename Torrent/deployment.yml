@@ -55,6 +55,7 @@ spec:
       initContainers:
       - image: frauhottelmann/openvpn-client
         name: openvpn
+        imagePullPolicy: IfNotPresent
         restartPolicy: Always
         resources: {}
         args:
