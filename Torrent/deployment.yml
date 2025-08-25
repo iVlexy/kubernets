@@ -61,7 +61,7 @@ spec:
         - --cd
         - vpn
         - --config
-        - miami.ovpn
+        - netherlands.ovpn
         - --auth-nocache
         volumeMounts:
         - mountPath: /dev/net/tun
