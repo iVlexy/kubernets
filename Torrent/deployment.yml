@@ -86,8 +86,8 @@ spec:
 
       # a folder with a config file (I use netherlands.ovpn)
       - name: openvpn
-        hostPath:
-          path: /usr/share/openvpn-config
+        secret:
+          secretName: qbittorrent-vpn-config
       
       # needed to tunnel traffic through VPN
       - name: tun-device 
