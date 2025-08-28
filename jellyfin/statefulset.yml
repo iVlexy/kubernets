@@ -1,3 +1,33 @@
+# This PVC is for the Jellyfin config and will be managed outside the StatefulSet.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-config-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin
+spec:
+  selector:
+    app: jellyfin
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8096
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 8920
+  type: NodePort
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -6,6 +36,7 @@ metadata:
     app: jellyfin
 spec:
   replicas: 1
+  serviceName: "jellyfin" # StatefulSet requires a serviceName
   selector:
     matchLabels:
       app: jellyfin
@@ -17,14 +48,23 @@ spec:
       securityContext:
         fsGroup: 65534
         runAsUser: 0
-      hostNetwork: true  # This is for network_mode: 'host'
+      hostNetwork: true
       containers:
         - name: jellyfin
           image: jellyfin/jellyfin
           volumeMounts:
-            - name: fonts-volume
+            - name: config-volume # Mount for the static PVC
+              mountPath: /config
+            - name: media-volume # Mount for the static media PVC
+              mountPath: /data/media
+            - name: fonts-volume # Ephemeral volume
               mountPath: /usr/local/share/fonts/custom
               readOnly: true
+            - name: jellyfin-cache-pvc # Mount for the cache volumeClaimTemplate
+              mountPath: /cache
+          ports:
+            - containerPort: 8096
+            - containerPort: 8920
       volumes:
         - name: config-volume
           persistentVolumeClaim:
@@ -32,38 +72,15 @@ spec:
         - name: media-volume
           persistentVolumeClaim:
             claimName: qbittorrent-downloads
+        - name: fonts-volume
+          emptyDir: {}
       restartPolicy: Always
   volumeClaimTemplates:
     - metadata:
-        name: jellyfin-cache-pvc
+        name: jellyfin-cache-pvc # This template creates the PVC for the cache
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 3Gi # Recommended size for configuration
-    - metadata:
-        name: jellyfin-config-pvc
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 3Gi # Recommended size for configuration
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: jellyfin
-spec:
-  selector:
-    app: jellyfin
-  ports:
-    # Use standard HTTP and HTTPS ports since hostNetwork is enabled
-    - protocol: TCP
-      port: 80
-      targetPort: 8096  # Port used by Jellyfin container for HTTP
-    - protocol: TCP
-      port: 443
-      targetPort: 8920  # Port used by Jellyfin container for HTTPS
-  type: NodePort  # Or NodePort, LoadBalancer depending on your cluster setup
+            storage: 3Gi
