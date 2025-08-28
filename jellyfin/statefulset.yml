@@ -14,6 +14,9 @@ spec:
       labels:
         app: jellyfin
     spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 0
       hostNetwork: true  # This is for network_mode: 'host'
       containers:
         - name: jellyfin
