@@ -102,7 +102,7 @@ spec:
         name: qbittorrent-downloads
       spec:
         accessModes:
-          - ReadWriteOnce
+          - ReadWriteMany
         resources:
           requests:
             storage: 750Gi # Recommended size for downloads
