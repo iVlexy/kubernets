@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: qbittorrent
+  name: qbittorrent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qbittorrent
+  serviceName: qbittorrent-headless
+  template:
+    metadata:
+      labels:
+        app: qbittorrent
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 0
+      containers:
+
+        # qbittorrent container
+        - image: lscr.io/linuxserver/qbittorrent:latest
+          imagePullPolicy: IfNotPresent
+          name: qbittorrent
+          env:
+            - name: TZ
+              value: "America/New_York"
+          ports:
+            - name: webui
+              containerPort: 8080
+            - name: tcplistening
+              containerPort: 6881
+            - name: udplistening
+              containerPort: 6881
+              protocol: UDP
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /downloads
+              name: downloads
+            - mountPath: /dev/net/tun
+              readOnly: true
+              name: tun-device
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+
+            #        - name: start
+            #          mountPath: /etc/openvpn/start.sh
+            #          subPath: start.sh
+
+      # vpn client container
+      initContainers:
+        - image: frauhottelmann/openvpn-client
+          name: openvpn
+          imagePullPolicy: IfNotPresent
+          restartPolicy: Always
+          resources: {}
+          args:
+            - --cd
+            - vpn
+            - --config
+            - netherlands.ovpn
+            - --auth-nocache
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              readOnly: true
+              name: tun-device
+            - mountPath: /vpn
+              name: openvpn
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+
+      volumes:
+        # qbittorrent config
+        - name: config
+          persistentVolumeClaim:
+            claimName: qbittorrent-config
+
+        # place where the torrented data goes
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: qbittorrent-downloads
+
+        # a folder with a config file (I use netherlands.ovpn)
+        - name: openvpn
+          secret:
+            secretName: qbittorrent-vpn-config
+
+        # needed to tunnel traffic through VPN
+        - name: tun-device
+          hostPath:
+            path: /dev/net/tun
+
+  volumeClaimTemplates:
+    - metadata:
+        name: qbittorrent-config
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi # Recommended size for configuration
+    - metadata:
+        name: qbittorrent-downloads
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 750Gi # Recommended size for downloads
