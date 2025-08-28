@@ -15,15 +15,9 @@ spec:
         app: jellyfin
     spec:
       hostNetwork: true  # This is for network_mode: 'host'
-      securityContext:
-        runAsUser: <uid>  # Replace with your user ID
-        runAsGroup: <gid> # Replace with your group ID
       containers:
         - name: jellyfin
           image: jellyfin/jellyfin
-          env:
-            - name: JELLYFIN_PublishedServerUrl
-              value: "http://example.com"
           volumeMounts:
             - name: config-volume
               mountPath: /config
@@ -41,19 +35,19 @@ spec:
         - name: config-volume
           persistentVolumeClaim:
             claimName: jellyfin-config-pvc
-        - name: cache-volume
-          persistentVolumeClaim:
-            claimName: jellyfin-cache-pvc
         - name: media-volume
           persistentVolumeClaim:
-            claimName: jellyfin-media-pvc
-        - name: media2-volume
-          persistentVolumeClaim:
-            claimName: jellyfin-media2-pvc
-        - name: fonts-volume
-          persistentVolumeClaim:
-            claimName: jellyfin-fonts-pvc
+            claimName: qbittorrent-downloads
       restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: jellyfin-cache-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi # Recommended size for configuration
 ---
 apiVersion: v1
 kind: Service
@@ -70,4 +64,4 @@ spec:
     - protocol: TCP
       port: 443
       targetPort: 8920  # Port used by Jellyfin container for HTTPS
-  type: ClusterIP  # Or NodePort, LoadBalancer depending on your cluster setup
+  type: NodePort  # Or NodePort, LoadBalancer depending on your cluster setup
