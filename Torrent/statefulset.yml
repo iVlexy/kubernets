@@ -27,14 +27,6 @@ spec:
           env:
             - name: TZ
               value: "America/New_York"
-            - name: WEBUI_PORT
-              value: 8080
-            - name: AuthSubnetWhitelist
-              value: 192.168.0.0/16, 10.0.0.0/8
-            - name: AuthSubnetWhitelistEnabled
-              value: true
-            - name: HostHeaderValidation
-              value: false
           ports:
             - name: webui
               containerPort: 8080
