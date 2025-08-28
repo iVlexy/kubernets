@@ -36,13 +36,17 @@ spec:
               containerPort: 6881
               protocol: UDP
           volumeMounts:
-            - mountPath: /config
-              name: config
-            - mountPath: /downloads
-              name: downloads
-            - mountPath: /dev/net/tun
+
+            - name: qbittorrent-config
+              mountPath: /config
+
+            - name: qbittorrent-downloads
+              mountPath: /downloads
+
+            - name: tun-device
+              mountPath: /dev/net/tun
               readOnly: true
-              name: tun-device
+              
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]
@@ -75,16 +79,6 @@ spec:
               add: ["NET_ADMIN"]
 
       volumes:
-        # qbittorrent config
-        - name: config
-          persistentVolumeClaim:
-            claimName: qbittorrent-config
-
-        # place where the torrented data goes
-        - name: downloads
-          persistentVolumeClaim:
-            claimName: qbittorrent-downloads
-
         # a folder with a config file (I use netherlands.ovpn)
         - name: openvpn
           secret:
