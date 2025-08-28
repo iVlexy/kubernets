@@ -22,15 +22,6 @@ spec:
         - name: jellyfin
           image: jellyfin/jellyfin
           volumeMounts:
-            - name: config-volume
-              mountPath: /config
-            - name: cache-volume
-              mountPath: /cache
-            - name: media-volume
-              mountPath: /media
-            - name: media2-volume
-              mountPath: /media2
-              readOnly: true
             - name: fonts-volume
               mountPath: /usr/local/share/fonts/custom
               readOnly: true
@@ -50,7 +41,15 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 5Gi # Recommended size for configuration
+            storage: 3Gi # Recommended size for configuration
+    - metadata:
+        name: jellyfin-config-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 3Gi # Recommended size for configuration
 ---
 apiVersion: v1
 kind: Service
