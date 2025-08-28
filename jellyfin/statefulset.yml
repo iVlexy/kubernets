@@ -71,7 +71,7 @@ spec:
             claimName: jellyfin-config-pvc
         - name: media-volume
           persistentVolumeClaim:
-            claimName: qbittorrent-downloads-qbittorrent-0
+            claimName: qbittorrent-downloads-qbittorrent-0 #Update
         - name: fonts-volume
           emptyDir: {}
       restartPolicy: Always
