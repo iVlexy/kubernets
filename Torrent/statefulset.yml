@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+  annotations:
+        volume.kubernetes.io/selected-node: kube
   labels:
     app: qbittorrent
   name: qbittorrent
