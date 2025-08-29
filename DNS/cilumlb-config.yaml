@@ -1,0 +1,8 @@
+# cilium-lb-pool.yaml
+apiVersion: cilium.io/v2alpha1
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: pihole-lb-pool
+spec:
+  blocks:
+  - cidr: 192.168.86.10/32
