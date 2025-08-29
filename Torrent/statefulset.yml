@@ -1,8 +1,6 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  annotations:
-        volume.kubernetes.io/selected-node: kube
   labels:
     app: qbittorrent
   name: qbittorrent
@@ -95,6 +93,8 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: qbittorrent-config
+        annotations:
+          volume.kubernetes.io/selected-node: kube
       spec:
         accessModes:
           - ReadWriteOnce
@@ -103,6 +103,8 @@ spec:
             storage: 5Gi # Recommended size for configuration
     - metadata:
         name: qbittorrent-downloads
+        annotations:
+          volume.kubernetes.io/selected-node: kube
       spec:
         accessModes:
           - ReadWriteOnce
