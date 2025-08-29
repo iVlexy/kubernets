@@ -4,13 +4,40 @@ kind: Namespace
 metadata:
   name: pihole
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-headless
+  namespace: pihole
+  labels:
+    app: pihole
+spec:
+  clusterIP: None # This makes it a headless service for the StatefulSet
+  selector:
+    app: pihole
+  ports:
+    # Port for the web interface
+    - name: http
+      port: 80
+      targetPort: 80
+    # Port for DNS via UDP
+    - name: dns-udp
+      port: 53
+      targetPort: 53
+      protocol: UDP
+    # Port for DNS via TCP
+    - name: dns-tcp
+      port: 53
+      targetPort: 53
+      protocol: TCP
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: pihole-ingress
   namespace: pihole
   annotations:
-    # Use the correct class name for your controller
+    # Use the correct ingress class name for your controller
     kubernetes.io/ingress.class: ingress-nginx
 spec:
   rules:
@@ -21,7 +48,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: pihole-web
+            name: pihole-headless # The backend service is the headless service
             port:
               number: 80
 ---
@@ -42,8 +69,8 @@ metadata:
   labels:
     app: pihole
 spec:
-  serviceName: "pihole"
-  replicas: 1 # Start with 1, or configure for HA with external sync
+  serviceName: "pihole-headless" # Must match the headless service name
+  replicas: 1
   selector:
     matchLabels:
       app: pihole
@@ -57,7 +84,7 @@ spec:
         image: pihole/pihole:latest
         env:
         - name: TZ
-          value: 'America/New_York' # Update with your timezone
+          value: 'America/New_York'
         envFrom:
         - secretRef:
             name: pihole-secret
@@ -71,6 +98,14 @@ spec:
         - containerPort: 80
           name: http
           protocol: TCP
+        volumeMounts:
+        - name: pihole-storage
+          mountPath: /etc/pihole
+        - name: dnsmasq-storage
+          mountPath: /etc/dnsmasq.d
+      # Enable these lines for host network access if DNS is for the cluster
+      # hostNetwork: true
+      # dnsPolicy: ClusterFirstWithHostNet
   volumeClaimTemplates:
   - metadata:
       name: pihole-storage
