@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: pihole-gateway
+  namespace: pihole
+spec:
+  selector:
+    # Use the default Istio ingress gateway
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*" # Expose on all hosts
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: pihole-virtualservice
+  namespace: pihole
+spec:
+  hosts:
+  - "*" # Route any host to this service
+  gateways:
+  - pihole-gateway
+  http:
+  - route:
+    - destination:
+        host: pihole-headless.pihole.svc.cluster.local # Target the internal headless service
+        port:
+          number: 80
