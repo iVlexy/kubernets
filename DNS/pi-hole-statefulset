@@ -35,7 +35,10 @@ spec:
         image: pihole/pihole:latest
         env:
         - name: TZ
-          value: 'America/New_York' # YOUR TIMEZONE
+          value: 'America/New_York'
+        # Add the environment variable to make Pi-hole listen on all interfaces
+        - name: DNSMASQ_LISTENING
+          value: "all"
         envFrom:
         - secretRef:
             name: pihole-secret
@@ -59,6 +62,7 @@ spec:
         emptyDir: {}
       - name: dnsmasq-storage
         emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
