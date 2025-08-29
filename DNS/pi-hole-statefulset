@@ -75,6 +75,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: pihole-storage
+      annotations:
+        volume.kubernetes.io/selected-node: kube
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
@@ -82,6 +84,8 @@ spec:
           storage: 2Gi
   - metadata:
       name: dnsmasq-storage
+       annotations:
+         volume.kubernetes.io/selected-node: kube
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
