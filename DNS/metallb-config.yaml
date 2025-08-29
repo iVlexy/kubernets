@@ -5,9 +5,9 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  # Using a static, non-conflicting IP. The router is .86.1
-  # and the DHCP range starts at .86.20, so .86.10 is safe.
-  - 192.168.86.251-192.168.86.350
+  # Use a single IP address from the 10.100.x.x range
+  # Use a non-conflicting subnet, such as 10.100.0.10
+  - 10.100.0.10-10.100.0.250
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
