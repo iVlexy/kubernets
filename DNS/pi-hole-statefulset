@@ -22,7 +22,6 @@ spec:
   - port: 80
     name: http
     protocol: TCP
-  clusterIP: None # Makes this a Headless Service
   selector:
     app: pihole
 ---
