@@ -45,6 +45,7 @@ spec:
       labels:
         app: jellyfin
     spec:
+      nodeName: kube
       securityContext:
         fsGroup: 65534
         runAsUser: 0
