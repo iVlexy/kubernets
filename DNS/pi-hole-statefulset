@@ -52,6 +52,7 @@ spec:
       labels:
         app: pihole
     spec:
+      nodeName: kube
       containers:
       - name: pihole
         image: pihole/pihole:latest
