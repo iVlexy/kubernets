@@ -63,7 +63,7 @@ spec:
             storage: 1Gi
 
     - metadata:
-        name: dsnmasq-storage
+        name: dnsmasq-storage
       spec:
         accessModes:
           - ReadWriteOnce
