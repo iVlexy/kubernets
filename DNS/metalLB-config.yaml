@@ -1,0 +1,18 @@
+# metallb-config.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: pihole-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.86.10-192.168.86.10 # Pick a range in your LAN
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: pihole-advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - pihole-pool

@@ -70,9 +70,7 @@ metadata:
   name: pihole-dns-service
   namespace: pihole
 spec:
-  type: LoadBalancer # MetalLB will assign an IP to this
-  selector:
-    app: pihole
+  type: LoadBalancer
   ports:
   - name: dns-udp
     protocol: UDP
