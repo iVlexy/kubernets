@@ -6,7 +6,7 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  - 192.168.86.10-192.168.86.10 # Pick a range in your LAN
+  - 192.168.86.10-192.168.86.11 # Pick a range in your LAN
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement

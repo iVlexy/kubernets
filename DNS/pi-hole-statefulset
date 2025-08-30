@@ -39,6 +39,8 @@ spec:
         # Add the environment variable to make Pi-hole listen on all interfaces
         - name: DNSMASQ_LISTENING
           value: "all"
+        - name: FTL_CMD
+          value: "no-daemon"
         envFrom:
         - secretRef:
             name: pihole-secret
