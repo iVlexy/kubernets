@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pihole
+spec:
+  replicas: 1
+  serviceName: headless
+  selector: {}
+  template:
+    spec:
+      containers:
+        - name: pihole
+          image: pihole/pihole:latest
+          securityContext:
+            capabilities:
+              add: [ 'NET_BIND_SERVICE' ]
+          env:
+            - name: TZ
+              value: 'America/New_York'
+
+              # Add the environment variable to make Pi-hole listen on all interfaces
+            - name: DNSMASQ_LISTENING
+              value: "all"
+            - name: FTL_CMD
+              value: "no-daemon"
+            - name: PIHOLE_DNS_
+              value: "8.8.8.8;8.8.4.4"
+          envFrom:
+            - secretRef:
+                name: pihole-secret
+          ports:
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - name: pihole-storage
+              mountPath: /etc/pihole
+            - name: dnsmasq-storage
+              mountPath: /etc/dnsmasq.d
+            - name: dnsmasq-config
+              mountPath: /etc/dnsmasq.d/01-pihole.conf
+              subPath: 01-pihole.conf
+      volumes:
+        - name: dnsmasq-config
+          configMap:
+            name: pihole-dnsmasq
+
+
+  volumeClaimTemplates:
+    - metadata:
+        name: pihole-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+
+    - metadata:
+        name: dsnmasq-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

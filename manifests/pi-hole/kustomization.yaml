@@ -1,0 +1,27 @@
+resources:
+  - namespace.yaml
+  - stateful-set.yaml
+  - service-dns.yaml
+  - service-web.yaml
+  - service-headless.yaml
+
+namespace: pihole
+
+labels:
+  - pairs:
+      app: pihole
+    includeTemplates: true
+    includeSelectors: true
+
+secretGenerator:
+  - name: pihole-secret
+    literals:
+      - WEBPASSWORD=REPLACEME
+
+configMapGenerator:
+  - name: pihole-dnsmasq
+    files:
+      - config/01-pihole.conf
+
+generatorOptions:
+  disableNameSuffixHash: true

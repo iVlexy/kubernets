@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  type: NodePort # Used for web interface, as Google Mesh doesn't handle port mapping
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
