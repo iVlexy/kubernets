@@ -13,11 +13,6 @@ labels:
     includeTemplates: true
     includeSelectors: true
 
-secretGenerator:
-  - name: pihole-secret
-    literals:
-      - WEBPASSWORD=REPLACEME
-
 configMapGenerator:
   - name: pihole-dnsmasq
     files:

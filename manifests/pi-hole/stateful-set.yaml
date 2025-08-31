@@ -25,9 +25,6 @@ spec:
               value: "no-daemon"
             - name: PIHOLE_DNS_
               value: "8.8.8.8;8.8.4.4"
-          envFrom:
-            - secretRef:
-                name: pihole-secret
           ports:
             - containerPort: 53
               name: dns-udp
